@@ -17,6 +17,7 @@ public:
     void handleKeyboardInput(sf::Event event);
 private:
     GapBuffer& gb;
+    int cursor = 0;
 };
 
 #endif

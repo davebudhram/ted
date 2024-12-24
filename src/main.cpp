@@ -3,12 +3,14 @@
 #include "../include/InputController.h"
 #include <string>
 #include "../SFML/include/SFML/Graphics.hpp"
+// #include "./Cursor.h"
 
 
 
 int main() {
     GapBuffer gapBuffer(20); 
     InputController inputController(gapBuffer);
+    // Cursor cursor(gapBuffer);
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Test");
     sf::Font font;
     font.loadFromFile("../fonts/Monaco.ttf"); 

@@ -10,9 +10,12 @@
 GapBuffer::GapBuffer(size_t initial_size){
     this->buffer.resize(initial_size);
     this->gapStart = 0;
-    this->gapSize = 10;
+    this->gapSize = 10; // This is fixed to 10
     this->gapEnd = this->gapSize - this->gapStart - 1;
-    this->size = 10;
+    this->size = 10; // To represent how much of the buffer is filled.
+    this->cursor = 0; // Single index of where the cursor is
+    
+
 }
 
 void GapBuffer::moveGap(int cursor){
@@ -30,8 +33,6 @@ void GapBuffer::moveGap(int cursor){
             this->gapStart += 1;
             this->gapEnd += 1;
             this->buffer[this->gapStart-1] = buffer[this->gapEnd]; 
-        // buffer[gap_right]='_';
-            // Move one after gap end to gapp start
         }
     }
 }
@@ -40,7 +41,7 @@ void GapBuffer::moveGap(int cursor){
 // Does not handle updating the given cursor position
 // If the cursor changes to a class then possibly it might make sense to change it here
 // As of now the Gap buffer class operates independtly from the view
-void GapBuffer::insert(const std::string& input, int cursor) {
+void GapBuffer::insert(const std::string& input) {
     int i = 0; 
 
     if (cursor != this->gapStart) { 
@@ -55,7 +56,19 @@ void GapBuffer::insert(const std::string& input, int cursor) {
         this->buffer[this->gapStart] = input[i];
         this->gapStart += 1;
         i +=1;
+        this->cursor += 1;
     }
+}
+
+void GapBuffer::backspace() {
+    // Want to backsapce at the cursor position
+    if (this->cursor > 0) {
+         this->gapStart -= 1;
+        this->cursorLeft();
+    }
+   
+    
+    
 }
 
 void GapBuffer::grow() {
@@ -90,10 +103,120 @@ void GapBuffer::grow() {
 std::string GapBuffer::bufferText() {
     std::vector<char> vec;
     for (int i = 0; i < this->buffer.size(); i++) {
+        if (i == this->cursor) {
+            vec.push_back('|');
+        }
         if ((i < this->gapStart || i > this->gapEnd) && i < this->size) {
             vec.push_back(this->buffer[i]);
         }
+
     }
     std::string str(vec.begin(), vec.end());
     return str;
+}
+
+void GapBuffer::cursorLeft() {
+    if (this->cursor > 0) {
+        this->cursor -= 1;
+        this->moveGap(this->cursor);
+    }
+}
+
+void GapBuffer::cursorRight() {
+    if (this->cursor < this->size - (this->gapEnd - this->gapStart + 1)) {
+        this->cursor += 1;
+        this->moveGap(this->cursor);
+    }
+}
+
+void GapBuffer::cursorUp() {
+
+    // Algorithm is simple but O(n) (Computers these days should be able to handle)
+    // starting from the cursor go backuntil we get a new line. Keep track
+    // of how many characters we saw
+    // Go to next new line or position 0. If we get to position 0 end put cursor at 0
+    // If we find a new line
+    // Go right to amount of characters we went left originally until
+    if (this->cursor == 0) {
+        return;
+    }
+    int cursor_copy = this->cursor - 1;
+    int width = 0;
+    while (cursor_copy >= 0) {
+        if (cursor_copy == 0) {
+            this->cursor = 0;
+            this->moveGap(this->cursor);
+            return;
+        }
+        if (this->buffer[cursor_copy] == '\n' ) {
+            break;
+        }
+        cursor_copy -= 1;
+        width += 1;
+    }
+    int width2 = 0;
+    while (cursor_copy >= 0) {
+        if (cursor_copy == 0) {
+            break;
+        }
+        cursor_copy -= 1;
+        width2 += 1;
+        if (this->buffer[cursor_copy] == '\n') {
+            width2 -= 1;
+            cursor_copy +=1;
+            break;
+        }
+
+    }
+    this->cursor = cursor_copy + std::min(width, width2);
+    this->moveGap(this->cursor);
+}
+
+void GapBuffer::cursorDown() {
+    if (this->cursor == this->size - (this->gapEnd - this->gapStart) - 1) {
+        return;
+    }
+    // This algorithm is more complicated I'm guessing due to now having to deal with the gap.
+    // We might also need to go left and then right possibily
+    // Go left to get the width of the current line (when we add a current pos in we won't need this)
+    // Go left get width of this line. Go until cursor pos is 0 or /n. If a new line do then same as before
+    // Then go back to the current cursor position
+    // Go right until we find a new line or until we reach the size of the gap buffer. 
+    // If we reach the end stay there
+    // If we reach new line
+    // Go right for the width of the line or until the end of the line
+
+    int cursorCopy = this->cursor - 1;
+    int width = 0;
+    while (cursorCopy >= 0) {
+        if (this->buffer[cursorCopy] == '\n') {
+            break;
+        }
+        cursorCopy -= 1;
+        width += 1;
+    }
+    cursorCopy = this->cursor + 1;
+
+    // // std::cout << "cursor" << this->cursor << '\n';
+    // // std::cout << "gapstart" << this->gapStart<< '\n';
+    // // std::cout << "gapend" << this->gapEnd<< '\n';
+    // // std::cout << "size"  << this->size<< '\n';
+    // std::cout << "width"  << width<< '\n';
+    // std::cout << "cursorCopy" << cursorCopy<< '\n';
+    // // std::cout << this->buffer[cursorCopy]<< '\n';
+    // std::string bufferString = "";
+    // for (char c : this->buffer) {
+    //     if (c == '\n') {
+    //         bufferString += "NL";
+    //     }
+    //     else {
+    //         bufferString += c;
+    //     }
+        
+    // }
+    // std::cout << bufferString << std::endl;
+    
+    this->cursor = cursorCopy;
+    this->moveGap(this->cursor);
+
 }

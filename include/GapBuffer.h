@@ -7,11 +7,16 @@
 class GapBuffer {
 public:
     GapBuffer(size_t initial_size = 100);
-    void moveGap(int cursor); // Move the gap to the left or to the right
-    void insert(const std::string& input, int cursor);
+    void moveGap(int cursor); 
+    void insert(const std::string& input);
+    void backspace();
     std::string bufferText();
     void grow();
-    std::vector<char> buffer; // This is our gap buffer. It will store all of the text
+    std::vector<char> buffer; 
+    void cursorLeft();
+    void cursorRight();
+    void cursorUp();
+    void cursorDown();
 
 private:
     int gapStart; // The starting index of the gap. The gapStart is essentially the location of the cursor
@@ -19,6 +24,7 @@ private:
                 // the size of the buffer we have to expand our vector.
     int gapSize;
     int size;
+    int cursor;
 };
 
 #endif
