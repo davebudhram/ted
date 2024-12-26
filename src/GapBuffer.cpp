@@ -195,7 +195,29 @@ void GapBuffer::cursorDown() {
         cursorCopy -= 1;
         width += 1;
     }
-    cursorCopy = this->cursor + 1;
+    cursorCopy = this->gapEnd + 1;
+    // find the next new line
+    int width2 = 0;
+    while (cursorCopy < this->size) {
+       
+        if (this->buffer[cursorCopy] == '\n') {
+            width2 += 1;
+            break;
+        }
+        cursorCopy += 1;
+        width2 += 1;
+    }
+    this->cursor += width2;
+    this->moveGap(this->cursor);
+    int width3 = 0;
+    while (cursorCopy < this->size) {
+        cursorCopy += 1;
+        width3 += 1;
+        if (this->buffer[cursorCopy] == '\n') {
+            width3 -= 1;
+            break;
+        }
+    }
 
     // // std::cout << "cursor" << this->cursor << '\n';
     // // std::cout << "gapstart" << this->gapStart<< '\n';
@@ -214,9 +236,10 @@ void GapBuffer::cursorDown() {
     //     }
         
     // }
-    // std::cout << bufferString << std::endl;
+    std::cout << std::to_string(width) << std::endl;
+    std::cout << std::to_string(width3) << std::endl;
     
-    this->cursor = cursorCopy;
+    this->cursor += std::min(width, std::max(width3 - 1, 0));
     this->moveGap(this->cursor);
 
 }
