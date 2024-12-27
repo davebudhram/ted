@@ -17,6 +17,8 @@ public:
     void cursorRight();
     void cursorUp();
     void cursorDown();
+    int lineNum; // The current line the cursor is at
+    int charWidth; // the current position on the line the cursor it at
 
 private:
     int gapStart; // The starting index of the gap. The gapStart is essentially the location of the cursor
@@ -25,6 +27,8 @@ private:
     int gapSize;
     int size;
     int cursor;
+
+    int currentLineCharWidth(int p); // Get the current line character width
 };
 
 #endif

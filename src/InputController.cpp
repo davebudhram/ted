@@ -24,11 +24,14 @@ void InputController::handleKeyboardInput(sf::Event event) {
         else if (event.key.code == sf::Keyboard::Down) {
             this->gb.cursorDown();
         }
+        else if (event.key.code == sf::Keyboard::Escape) {
+            std::cout << "(" << gb.lineNum << ", " << gb.charWidth << ")" << std::endl;
+        }
     }
     if (event.type == sf::Event::TextEntered) {
         if (event.text.unicode < 128 && event.text.unicode != 8) { // Check for ASCII characters
             char character = static_cast<char>(event.text.unicode);
-           std::string str(1, character);
+            std::string str(1, character);
             this->gb.insert(str);
             this->cursor++;
 
