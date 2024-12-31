@@ -7,10 +7,10 @@
 // Constructor for the Gap Buffer. Sets the initial size. When constructed, 
 // the buffer should be empty. 
 // Need to figure out later how to handle opening and reading files.
-GapBuffer::GapBuffer(size_t initial_size){
+GapBuffer::GapBuffer(size_t initial_size) {
     this->buffer.resize(initial_size);
     this->gapStart = 0;
-    this->gapSize = 10; // This is fixed to 10
+    this->gapSize = 10; 
     this->gapEnd = this->gapSize - this->gapStart - 1;
     this->size = 10; // To represent how much of the buffer is filled.
     this->cursor = 0; // Single index of where the cursor is
