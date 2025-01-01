@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Main Application (add source files for your main executable)
-add_executable(TED src/main.cpp src/GapBuffer.cpp src/Controller.cpp src/TextEditor.cpp)
+add_executable(TED src/main.cpp src/GapBuffer.cpp src/Controller.cpp src/TextEditor.cpp src/View.cpp)
 
 
 #***************************************************************************************************

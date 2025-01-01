@@ -1,4 +1,5 @@
 #include "./TextEditor.h" 
+#include "./View.h"
 #include "../SFML/include/SFML/Graphics.hpp"
 
 #ifndef CONTROLLER_H
@@ -14,10 +15,11 @@
 // Having shift pressed and having a letter pressed will be tricky. 
 class Controller {
     public:
-        Controller(TextEditor& textEditor): textEditor(textEditor) {}
+        Controller(TextEditor& textEditor, View& view): textEditor(textEditor), view(view) {}
         void handleKeyboardInput(sf::Event event);
     private:
         TextEditor& textEditor;
+        View& view;
 };
 
 #endif
