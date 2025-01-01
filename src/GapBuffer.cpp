@@ -265,10 +265,10 @@ void GapBuffer::cursorDown() {
         charWidth = width + width2;
     } 
     else {
-        charWidth = std::min(width, std::max(width3 - 1, 0));
+        charWidth = std::min(width, std::max(width3, 0));
         lineNum += 1;
     }
-    this->cursor += std::min(width, std::max(width3 - 1, 0));
+    this->cursor += std::min(width, std::max(width3, 0));
     this->moveGap(this->cursor);
 
 }
