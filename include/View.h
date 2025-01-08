@@ -18,11 +18,16 @@ class View {
         // Methods
         void render();
         void updateText(const std::string&  text);
+        void updateCursor(int x, int y);
     private:
         // Fields
         sf::RenderWindow& window;
         sf::Font font;
         sf::Text text;
+        sf::RectangleShape cursor;
+        int fontWidth; // the width of a characetr for the font
+        int cursor_x;
+        int cursor_y;
 };
 
 #endif

@@ -40,3 +40,11 @@ void TextEditor::cursorDown() {
 int TextEditor::numLines() {
     return this->totalLines;
 }
+
+int TextEditor::lineNum() {
+    return this->gapBuffer.lineNum;
+}
+
+int TextEditor::charWidth() {
+    return this->gapBuffer.charWidth;
+}

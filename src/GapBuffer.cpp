@@ -241,10 +241,17 @@ void GapBuffer::cursorDown() {
     cursorCopy = this->gapEnd + 1;
     // find the next new line
     int width2 = 0;
-    while (cursorCopy < this->size) {
+    while (cursorCopy <= this->size) {
+        if (cursorCopy == this->size) {
+            this->cursor += width2;
+            this->moveGap(this->cursor);
+            this->charWidth = width + width2;
+            return;
+        }
        
         if (this->buffer[cursorCopy] == '\n') {
             width2 += 1;
+            lineNum += 1;
             break;
         }
         cursorCopy += 1;
@@ -258,16 +265,13 @@ void GapBuffer::cursorDown() {
         width3 += 1;
         if (this->buffer[cursorCopy] == '\n') {
             width3 -= 1;
+
             break;
         }
     }
-    if (width3 == 0) {
-        charWidth = width + width2;
-    } 
-    else {
-        charWidth = std::min(width, std::max(width3, 0));
-        lineNum += 1;
-    }
+    charWidth = std::min(width, std::max(width3, 0));
+    std::cout << width << " " << width3 << std::endl;
+
     this->cursor += std::min(width, std::max(width3, 0));
     this->moveGap(this->cursor);
 

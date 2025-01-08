@@ -22,6 +22,8 @@ class TextEditor {
         void cursorUp();
         void cursorDown();
         int numLines();
+        int lineNum();
+        int charWidth();
     private:
         // Fields
         GapBuffer gapBuffer;

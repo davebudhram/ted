@@ -33,6 +33,7 @@ void Controller::handleKeyboardInput(sf::Event event) {
         }
     }
     this->view.updateText(this->textEditor.text());
+    this->view.updateCursor(this->textEditor.lineNum(), this->textEditor.charWidth());
 
     
 } 
