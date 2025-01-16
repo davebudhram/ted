@@ -1,12 +1,13 @@
 #include "../include/GapBuffer.h" 
 #include <iostream>
 
-// Need to figure out how to delete. (Should we start with backspace or would a general implementation)
-// Work better
- 
-// Constructor for the Gap Buffer. Sets the initial size. When constructed, 
-// the buffer should be empty. 
-// Need to figure out later how to handle opening and reading files.
+// https://www.geeksforgeeks.org/gap-buffer-data-structure/
+/**
+ * Constructor for the Gap Buffer. Hardcoded the initial gap size to be 10. This means the gap start
+ * is 0 and the gap end is 9. We also store the current lineNum and charWidth in order to figure out
+ * where the cursor should be. The int cursor is the index in the buffer where the cursor should be.
+ * Size refers to how much of the buffer is actually being used
+ */
 GapBuffer::GapBuffer(size_t initial_size) {
     this->buffer.resize(initial_size);
     this->gapStart = 0;
@@ -18,69 +19,31 @@ GapBuffer::GapBuffer(size_t initial_size) {
     this->charWidth = 0;
 }
 
+/**
+ * Move the gap to the cursor position given
+ */
 void GapBuffer::moveGap(int cursor){
-    // Move left
+    // Move leff
     if (cursor < this->gapStart) {
         while (cursor < this->gapStart) {
-            // Move one before gap start to end of gap
             this->buffer[this->gapEnd] = this->buffer[this->gapStart - 1];
-            //this->buffer[this->gapStart - 1] = '*';
             this->gapStart--;
             this->gapEnd--;
         }
     }
+    // Move right
     else if (cursor > this->gapStart) {
         while (cursor > this->gapStart) {
             this->gapStart += 1;
             this->gapEnd += 1;
             this->buffer[this->gapStart-1] = buffer[this->gapEnd]; 
-            //this->buffer[this->gapEnd] = '*';
         }
     }
 }
 
-// Inserts the given string at the given cursor position.
-// Does not handle updating the given cursor position
-// If the cursor changes to a class then possibly it might make sense to change it here
-// As of now the Gap buffer class operates independtly from the view
-void GapBuffer::insert(const std::string& input) {
-    int i = 0; 
-
-    if (cursor != this->gapStart) { 
-        this->moveGap(cursor);
-    } 
-    // TODO: Change to a for loop or for each loop
-    while (i < input.length()) {
-        // The gap only has one element so we need to resize it
-        if (this->gapStart == this->gapEnd) {
-            this->grow();
-        }
-        this->buffer[this->gapStart] = input[i];
-        this->gapStart += 1;
-        this->cursor += 1;
-        if (input[i] == '\n') {
-            this->lineNum += 1;
-            this->charWidth = 0;
-        }
-        else {
-            this->charWidth += 1;
-        }
-        i +=1;
-        
-    }
-}
-
-void GapBuffer::backspace() {
-    // Want to backsapce at the cursor position
-    if (this->cursor > 0) {
-        this->gapStart -= 1;
-        this->cursorLeft();
-    }
-   
-    
-    
-}
-
+/**
+ * Grow the gap size when the gap 
+ */
 void GapBuffer::grow() {
     // We do not need to grow if the gap still has space
     if (this->gapStart != this->gapEnd) {
@@ -99,7 +62,6 @@ void GapBuffer::grow() {
        temp.push_back(buffer[i]); 
     }
     this->gapEnd += this->gapSize ;
-    // Increase to gap to the size we want it to be
     int p = this->gapEnd + 1;
     // COPY elements over
     for (int i = 0; i < temp.size(); i++) {
@@ -110,19 +72,29 @@ void GapBuffer::grow() {
 
 }
 
-std::string GapBuffer::bufferText() {
-    std::vector<char> vec;
-    for (int i = 0; i < this->buffer.size(); i++) {
-        if (i == this->cursor) {
-            vec.push_back('|');
+/**
+ * Inserts the given string at the cursor location.
+ */
+void GapBuffer::insert(const std::string& input) {
+    if (cursor != this->gapStart) { 
+        this->moveGap(cursor);
+    } 
+    for (char c: input) {
+        // Grow the gap (if needed)
+        this->grow();
+        // Insert the character to the buffer
+        this->buffer[this->gapStart] = c;
+        this->gapStart += 1;
+        this->cursor += 1;
+        // Update the lineNum and charWidth
+        if (c == '\n') {
+            this->lineNum += 1;
+            this->charWidth = 0;
         }
-        if ((i < this->gapStart || i > this->gapEnd) && i < this->size) {
-            vec.push_back(this->buffer[i]);
+        else {
+            this->charWidth += 1;
         }
-
     }
-    std::string str(vec.begin(), vec.end());
-    return str;
 }
 
 void GapBuffer::cursorLeft() {
@@ -143,19 +115,6 @@ void GapBuffer::cursorLeft() {
 
 void GapBuffer::cursorRight() {
     if (this->cursor < this->size - (this->gapEnd - this->gapStart + 1)) {
-        // std::string bufferString2 = "";
-        // for (char c : this->buffer) {
-        //     if (c == '\n') {
-        //         bufferString2 += "NL";
-        //     }
-        //     else {
-        //         bufferString2 += c;
-        //     }
-            
-        // }
-        
-        // std::cout << bufferString2 << std::endl;
-        // std::cout << "(" << this->lineNum << ", " << this->charWidth << ")" << std::endl;
         if (this->buffer[this->gapEnd + 1] == '\n') {
             this->lineNum += 1;
             this->charWidth = 0;
@@ -163,14 +122,42 @@ void GapBuffer::cursorRight() {
         else {
             this->charWidth += 1;
         }
-         //std::cout << "(" << this->lineNum << ", " << this->charWidth << ")" << std::endl;
         this->cursor += 1;
         this->moveGap(this->cursor);
     }
 }
+/**
+ * Backspace by one character. O(1) operation. Does not change the array size.
+ */
+void GapBuffer::backspace() {
+    if (this->cursor > 0) {
+        this->gapStart -= 1;
+        this->cursorLeft();
+    }
+}
+
+/**
+ * Return the buffer text. This will need to change in the future to account for bolding, italicing
+ * and underlining.
+ */
+std::string GapBuffer::bufferText() {
+    std::vector<char> vec;
+    for (int i = 0; i < this->buffer.size(); i++) {
+        // Temporary to visualize the cursor is where it should be
+        if (i == this->cursor) {
+            vec.push_back('|');
+        }
+        if ((i < this->gapStart || i > this->gapEnd) && i < this->size) {
+            vec.push_back(this->buffer[i]);
+        }
+    }
+    std::string str(vec.begin(), vec.end());
+    return str;
+}
+
+
 
 void GapBuffer::cursorUp() {
-
     // Algorithm is simple but O(n) (Computers these days should be able to handle)
     // starting from the cursor go backuntil we get a new line. Keep track
     // of how many characters we saw
