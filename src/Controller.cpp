@@ -34,6 +34,23 @@ void Controller::handleKeyboardInput(sf::Event event) {
     }
     this->view.updateText(this->textEditor.text());
     this->view.updateCursor(this->textEditor.lineNum(), this->textEditor.charWidth());
-
-    
 } 
+
+void Controller::handleMouseClick(sf::Event event) {
+    if (event.type == sf::Event::MouseButtonPressed) {
+        if (event.mouseButton.button == sf::Mouse::Button::Left) {
+            // std::cout << "x:"<< event.mouseButton.x << " y:" << event.mouseButton.y << std::endl; 
+            int newLineNum = this->view.covertCursorY(event.mouseButton.y);
+            int newCharWidth = this->view.covertCursorX(event.mouseButton.x);
+            //std::cout << "new line:"<< newLineNum << " char width:" << newCharWidth << std::endl; 
+            this->textEditor.moveCursor(newLineNum, newCharWidth);
+            this->view.updateText(this->textEditor.text());
+            this->view.updateCursor(this->textEditor.lineNum(), this->textEditor.charWidth());
+
+        }
+        
+     
+     }
+    
+
+}

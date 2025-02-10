@@ -48,3 +48,7 @@ int TextEditor::lineNum() {
 int TextEditor::charWidth() {
     return this->gapBuffer.charWidth;
 }
+
+void TextEditor::moveCursor(int newLineNum, int newCharWidth) {
+    this->gapBuffer.moveCursor(newLineNum, newCharWidth);
+}

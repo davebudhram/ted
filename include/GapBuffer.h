@@ -16,6 +16,8 @@ class GapBuffer {
         void cursorRight();
         void cursorUp();
         void cursorDown();
+        void moveCursor(int newLineNum, int newCharWidth);
+        
         int lineNum; // The current line the cursor is at
         int charWidth; // the current position on the line the cursor it at
 
@@ -26,11 +28,17 @@ private:
     int gapSize;
     int size;
     int cursor;
+    std::vector<int> line_start_positions;
 
     // Methods
     void grow();
     void moveGap(int cursor); 
     int currentLineCharWidth(int p); // Get the current line character width
+    int currentLineWidth(int p);
+    int lastValidPosition();
+    void reputeCursor();
+    void update_line_start_positions();
+    
 };
 
 #endif

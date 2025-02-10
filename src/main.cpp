@@ -6,7 +6,7 @@
 #include "../SFML/include/SFML/Graphics.hpp"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Test");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "TED");
     TextEditor textEditor;
     View view(window);
     Controller controller(textEditor, view);
@@ -16,10 +16,9 @@ int main() {
             if (event.type == sf::Event::Closed)
                 window.close();
             controller.handleKeyboardInput(event);
+            controller.handleMouseClick(event);
         }
         view.render();
     }
-
-
     return 0;
 }

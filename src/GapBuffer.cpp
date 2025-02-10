@@ -16,17 +16,18 @@ GapBuffer::GapBuffer(size_t initial_size) {
     this->size = 10; // To represent how much of the buffer is filled.
     this->cursor = 0; // Single index of where the cursor is
     this->lineNum = 0;
-    this->charWidth = 0;
+    this->charWidth = 0;    
 }
 
 /**
  * Move the gap to the cursor position given
  */
 void GapBuffer::moveGap(int cursor){
-    // Move leff
+    // Move left
     if (cursor < this->gapStart) {
         while (cursor < this->gapStart) {
             this->buffer[this->gapEnd] = this->buffer[this->gapStart - 1];
+            this->buffer[this->gapStart - 1] = '*';
             this->gapStart--;
             this->gapEnd--;
         }
@@ -37,6 +38,7 @@ void GapBuffer::moveGap(int cursor){
             this->gapStart += 1;
             this->gapEnd += 1;
             this->buffer[this->gapStart-1] = buffer[this->gapEnd]; 
+            this->buffer[this->gapEnd] = '*';
         }
     }
 }
@@ -142,16 +144,20 @@ void GapBuffer::backspace() {
  */
 std::string GapBuffer::bufferText() {
     std::vector<char> vec;
-    for (int i = 0; i < this->buffer.size(); i++) {
+    std::vector<char> vec2;
+    for (int i = 0; i < this->size; i++) {
         // Temporary to visualize the cursor is where it should be
         if (i == this->cursor) {
-            vec.push_back('|');
+            vec2.push_back('|');
         }
-        if ((i < this->gapStart || i > this->gapEnd) && i < this->size) {
+        vec2.push_back(this->buffer[i]);
+        if ((i < this->gapStart || i > this->gapEnd)) {
             vec.push_back(this->buffer[i]);
         }
     }
     std::string str(vec.begin(), vec.end());
+    std::string str2(vec2.begin(), vec2.end());
+    std::cout << str2 << std::endl;
     return str;
 }
 
@@ -247,14 +253,15 @@ void GapBuffer::cursorDown() {
     this->cursor += width2;
     this->moveGap(this->cursor);
     int width3 = 0;
-    while (cursorCopy < this->size) {
+    while (cursorCopy <= this->size) {
         cursorCopy += 1;
-        width3 += 1;
-        if (this->buffer[cursorCopy] == '\n') {
-            width3 -= 1;
+        
+        if (this->buffer[cursorCopy] == '\n' || cursorCopy == this->size) {
+            // width3 -= 1;
 
             break;
         }
+        width3 += 1;
     }
     charWidth = std::min(width, std::max(width3, 0));
     std::cout << width << " " << width3 << std::endl;
@@ -276,4 +283,107 @@ int GapBuffer::currentLineCharWidth(int p) {
         width += 1;
     }
     return width;
+}
+
+int GapBuffer::currentLineWidth(int p) {
+    int width = 0;
+    while (p < this->size) {
+        if (p >= this->gapStart && p <= this->gapEnd) {
+            p++;
+            continue;
+        }
+
+        if (this->buffer[p] == '\n') {
+            break;
+        }
+        width++;
+        p++;
+    }
+    return width;
+}
+
+/**
+ * Move the cursor to the specified line and character width
+ * @param newLineNum The line number to move the cursor to
+ * @param newCharWidth The character width to move the cursor to
+ */
+void GapBuffer::moveCursor(int newLineNum, int newCharWidth) {
+    std::cout << "cursor " <<  this->cursor << std::endl;
+    std::cout << "gapStart " << this->gapStart << std::endl;
+    std::cout << "gapEnd " << this->gapEnd << std::endl;
+    std::cout << "size " << this->size << std::endl;
+    int currLineNum = 0;
+    int currCharWidth = 0;
+    int lastLineStart = 0;
+    for (int i = 0; i < this->size; i++) {
+       // Skip the gap
+        if (i >= this->gapStart && i <= this->gapEnd) {
+            continue;
+        }
+        // Look for character now
+        if (currLineNum == newLineNum) {
+            int j = i;
+            while (j < this->size) {
+                if (j >= this->gapStart && j <= this->gapEnd) {
+                    j += (this->gapEnd - this->gapStart + 1);
+                    continue;
+                }
+                if (currCharWidth == newCharWidth || this->buffer[j] == '\n') {
+                    if (this->cursor < j) {
+                        this->cursor = j - (this->gapEnd - this->gapStart + 1);
+                        this->moveGap(this->cursor);
+                    }
+                    else {
+                        this->cursor = j;
+                        this->moveGap(this->cursor);
+                    }
+                    this->reputeCursor();
+                    return;
+                }
+                currCharWidth += 1;
+                j++;
+            }
+            break;
+            // if (this->cursor < j) {
+            //     this->cursor = j - (this->gapEnd - this->gapStart + 1);
+            //     this->moveGap(this->cursor);
+            // }
+            // else {
+            //     this->cursor = j;
+            //     this->moveGap(this->cursor);
+            // }
+            // this->reputeCursor();
+            // return;
+        }
+                // Try to move the cursor to one before this line
+        if (this->buffer[i] == '\n') {
+            currLineNum += 1;
+        }
+    }
+    this->cursor = this->size - (this->gapEnd - this->gapStart + 1) ; // make it look right but not actually correct 
+    this->moveGap(this->cursor);
+    // TODO: This is wrong
+    this->reputeCursor();
+    // If we reach here, the specified line and character width are out of bounds
+}
+
+void GapBuffer::reputeCursor() {
+    this->lineNum = 0;
+    this->charWidth = 0;
+    for (int i = 0; i < this->size; i++) {
+        if (i == this->cursor) {
+            return;
+        }
+        if (i >= this->gapStart && i <= this->gapEnd) {
+            continue;
+        }
+
+        if (this->buffer[i] == '\n') {
+            this->lineNum += 1;
+            this->charWidth = 0;
+        }
+        else {
+            this->charWidth += 1;
+        }
+    }
 }

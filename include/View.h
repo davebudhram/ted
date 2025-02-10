@@ -19,6 +19,8 @@ class View {
         void render();
         void updateText(const std::string&  text);
         void updateCursor(int x, int y);
+        int covertCursorX(int x);
+        int covertCursorY(int y);
     private:
         // Fields
         sf::RenderWindow& window;

@@ -17,6 +17,7 @@ class Controller {
     public:
         Controller(TextEditor& textEditor, View& view): textEditor(textEditor), view(view) {}
         void handleKeyboardInput(sf::Event event);
+        void handleMouseClick(sf::Event event);
     private:
         TextEditor& textEditor;
         View& view;

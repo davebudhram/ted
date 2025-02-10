@@ -7,6 +7,7 @@ project(TED VERSION 1.0)
 # Specify C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Main Application (add source files for your main executable)
 add_executable(TED src/main.cpp src/GapBuffer.cpp src/Controller.cpp src/TextEditor.cpp src/View.cpp)
@@ -20,6 +21,7 @@ add_executable(TED src/main.cpp src/GapBuffer.cpp src/Controller.cpp src/TextEdi
 set(SFML_ROOT "${CMAKE_SOURCE_DIR}/SFML")
 set(SFML_INCLUDE_DIR "${SFML_ROOT}/include")
 set(SFML_LIBRARY_DIR "${SFML_ROOT}/lib")
+
 
 # Include the SFML headers
 include_directories(${SFML_INCLUDE_DIR})
